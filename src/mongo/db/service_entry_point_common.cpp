@@ -88,6 +88,7 @@
 #include "mongo/util/fail_point_service.h"
 #include "mongo/util/log.h"
 #include "mongo/util/scopeguard.h"
+#include "mongo/util/net/socket_utils.h"
 
 namespace mongo {
 
@@ -215,6 +216,8 @@ void generateErrorResponse(OperationContext* opCtx,
                            const BSONObj& replyMetadata,
                            BSONObj extraFields = {}) {
     registerError(opCtx, exception);
+
+    extraFields = extraFields.addField(BSON("host" << getHostNameCachedAndPort()).firstElement());
 
     // We could have thrown an exception after setting fields in the builder,
     // so we need to reset it to a clean state just to be sure.
